@@ -8,7 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
 function Copyright() {
@@ -24,7 +24,7 @@ function Copyright() {
   );
 }
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = theme => ({
   paper: {
     marginTop: theme.spacing(8),
     display: 'flex',
@@ -42,12 +42,33 @@ const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
-}));
+});
 
-export default function SignUp() {
-  const classes = useStyles();
+class SignUp extends React.Component {
+  constructor(){
+    super();
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
 
-  return (
+  handleSubmit(event) {
+    event.preventDefault();
+    const data = new FormData(event.target);
+    this.sendRequest(data);
+  }
+  async sendRequest(data){
+    const requestOptions = {
+      method: 'POST',
+      body: data
+      };
+    const response = await fetch('http://localhost:3000/auth/', requestOptions);
+    const dataresponse = await response.json();
+    console.log(dataresponse)
+  }
+
+  render(){ 
+    const { classes } = this.props;
+    return (
+
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
@@ -57,12 +78,12 @@ export default function SignUp() {
         <Typography component="h1" variant="h5">
           Registrarse
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form} noValidate onSubmit={this.handleSubmit}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField
                 autoComplete="fname"
-                name="firstName"
+                name="name"
                 variant="outlined"
                 required
                 fullWidth
@@ -78,7 +99,7 @@ export default function SignUp() {
                 fullWidth
                 id="lastName"
                 label="Apellido"
-                name="lastName"
+                name="last_name"
                 autoComplete="lname"
               />
             </Grid>
@@ -105,6 +126,18 @@ export default function SignUp() {
                 autoComplete="current-password"
               />
             </Grid>
+            <Grid item xs={12}>
+              <TextField
+                variant="outlined"
+                required
+                fullWidth
+                name="password_confirmation"
+                label="Confirmar Contraseña"
+                type="password"
+                id="password_confirmation"
+                autoComplete="current-password"
+              />
+            </Grid>
           </Grid>
           <Button
             type="submit"
@@ -128,5 +161,8 @@ export default function SignUp() {
         <Copyright />
       </Box>
     </Container>
-  );
+    );
+  }
 }
+
+export default  withStyles(useStyles)(SignUp);
